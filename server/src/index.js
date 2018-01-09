@@ -39,9 +39,19 @@ app.get('*', (req,res) => {
 
 	// When all our data has loaded we can render the components
 	Promise.all(promises).then(() => {
+		// Use context to pass into our staticRouter, if the route is not found
+		// it will use the NotFoundPage, where we will set context.notFound to true.
+		const context = {};
+
 		// Pass req to renderer - as the Static Router (SSR) needs to know the 
 		// URL being requested.
-		res.send(renderer(req, store));
+		const content = renderer(req, store, context);
+
+		if(context.notFound) {
+			res.status(404);
+		}
+
+		res.send(content);
 	});
 
 
